@@ -36,7 +36,7 @@ print("\n".join([
 ]))
 
 # Configurations for Youtube DL
-yt_dl_opts = {'format': 'bestaudio/best', 'outtmpl': 'download/%(title)s', 'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'}
+yt_dl_opts = {'format': 'bestaudio/best', 'outtmpl': 'download/%(id)s', 'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'}
 ytdl = YoutubeDL(yt_dl_opts)
 stream = True
 
