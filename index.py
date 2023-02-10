@@ -36,8 +36,9 @@ print("\n".join([
 ]))
 
 # Configurations for Youtube DL
-yt_dl_opts = {'format': 'bestaudio/best'}
+yt_dl_opts = {'format': 'bestaudio/best', 'outtmpl': 'download/%(title)s', 'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'}
 ytdl = YoutubeDL(yt_dl_opts)
+stream = True
 
 # Configurations for FFMPEG
 ffmpeg_options = {'options': "-vn"}
@@ -114,9 +115,9 @@ async def _init_command_play_response(interaction, url):
       # Similar to a Thread it will run independent from the program. Sent command will only
       # effect current user session
       loop = asyncio.get_event_loop()
-      data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=False))
+      data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
 
-      song = data['url']
+      song = data['url'] if stream else ytdl.prepare_filename(data)
       player = FFmpegPCMAudio(song, **ffmpeg_options)
 
       if voice_clients[interaction.guild.id] != None:
@@ -124,11 +125,12 @@ async def _init_command_play_response(interaction, url):
       else:
          return await interaction.followup.send("Not connected to a channel. Use /join first")
 
-      await interaction.followup.send(f"Start playing: {url}")
+      await interaction.followup.send(f"Start playing: \"{data['title']}\"")
 
    except Exception:
       print(f" > Exception occured processing play command: {traceback.print_exc()}")
       return await interaction.followup.send("Can not start Playback.")
+
 
 # Function to search playing
 async def _init_command_search_response(interaction, search):
@@ -143,9 +145,9 @@ async def _init_command_search_response(interaction, search):
       # Similar to a Thread it will run independent from the program. Sent command will only
       # effect current user session
       loop = asyncio.get_event_loop()
-      data = await loop.run_in_executor(None, lambda: ytdl.extract_info(f"ytsearch:{search}", download=False)['entries'][0]['formats'][0])
+      data = await loop.run_in_executor(None, lambda: ytdl.extract_info(f"ytsearch:{search}", download=True)['entries'][0])
 
-      song = data['url']
+      song = data['formats'][0]['url'] if stream else ytdl.prepare_filename(data)
       player = FFmpegPCMAudio(song, **ffmpeg_options)
 
       if voice_clients[interaction.guild.id] != None:
@@ -153,7 +155,7 @@ async def _init_command_search_response(interaction, search):
       else:
          return await interaction.followup.send("Not connected to a channel. Use /join first")
 
-      await interaction.followup.send(f"Start playing: \"{search}\"")
+      await interaction.followup.send(f"Start playing: \"{data['title']}\"")
 
    except Exception:
       print(f" > Exception occured processing search command: {traceback.print_exc()}")
