@@ -95,10 +95,10 @@ async def _init_command_join_response(interaction):
       voice_clients[voice_client.guild.id] = voice_client
 
       # Write in Chat that Bot joined channel
-      await interaction.followup.send(f"Joined Channel {interaction.user.voice.channel.name}")
+      await interaction.followup.send(f"Joined Channel \"{interaction.user.voice.channel.name}\"")
    except Exception:
       print(f" > Exception occured processing join command: {traceback.print_exc()}")
-      return await interaction.followup.send("Exception occured processing join command. Please contact <@164129430766092289> when this happened.")
+      return await interaction.followup.send("Unable to Join Channel. Make sure you are in a Voice Channel.")
 
 
 # Function to start playing
