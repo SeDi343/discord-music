@@ -115,7 +115,7 @@ async def _init_command_play_response(interaction, url):
       # Similar to a Thread it will run independent from the program. Sent command will only
       # effect current user session
       loop = asyncio.get_event_loop()
-      data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
+      data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=(not stream)))
 
       song = data['url'] if stream else ytdl.prepare_filename(data)
       player = FFmpegPCMAudio(song, **ffmpeg_options)
@@ -145,7 +145,7 @@ async def _init_command_search_response(interaction, search):
       # Similar to a Thread it will run independent from the program. Sent command will only
       # effect current user session
       loop = asyncio.get_event_loop()
-      data = await loop.run_in_executor(None, lambda: ytdl.extract_info(f"ytsearch:{search}", download=True)['entries'][0])
+      data = await loop.run_in_executor(None, lambda: ytdl.extract_info(f"ytsearch:{search}", download=(not stream))['entries'][0])
 
       song = data['formats'][0]['url'] if stream else ytdl.prepare_filename(data)
       player = FFmpegPCMAudio(song, **ffmpeg_options)
