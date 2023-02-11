@@ -3,4 +3,5 @@ ffmpeg
 PyNaCl
 asyncio
 requests
+yt-dlp
 youtube_dl

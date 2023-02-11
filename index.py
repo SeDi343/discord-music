@@ -6,7 +6,8 @@ import json
 import asyncio
 import requests
 import traceback
-from youtube_dl import YoutubeDL
+#from youtube_dl import YoutubeDL
+from yt_dlp import YoutubeDL
 from discord import app_commands, Intents, Client, Interaction, Status, Game, FFmpegPCMAudio
 
 #########################################################################################
@@ -36,9 +37,13 @@ print("\n".join([
 ]))
 
 # Configurations for Youtube DL
-yt_dl_opts = {'format': 'bestaudio/best', 'outtmpl': 'download/%(id)s', 'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'}
+yt_dl_opts = {
+   'format': 'm4a/bestaudio/best',
+   'outtmpl': 'download/%(id)s',
+   'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'
+}
 ytdl = YoutubeDL(yt_dl_opts)
-stream = True
+stream = False
 
 # Configurations for FFMPEG
 ffmpeg_options = {'options': "-vn"}
@@ -120,8 +125,15 @@ async def _init_command_play_response(interaction, url):
       song = data['url'] if stream else ytdl.prepare_filename(data)
       player = FFmpegPCMAudio(song, **ffmpeg_options)
 
+      # Check if Bot is connected to a channel
       if voice_clients[interaction.guild.id] != None:
-         voice_clients[interaction.guild.id].play(player)
+         # Check if Bot is not already playing
+         if not voice_clients[interaction.guild.id].is_playing():
+            voice_clients[interaction.guild.id].play(player)
+         # If Bot is currently playing stop playback and start new playback
+         else:
+            voice_clients[interaction.guild.id].stop()
+            voice_clients[interaction.guild.id].play(player)
       else:
          return await interaction.followup.send("Not connected to a channel. Use /join first")
 
@@ -147,11 +159,18 @@ async def _init_command_search_response(interaction, search):
       loop = asyncio.get_event_loop()
       data = await loop.run_in_executor(None, lambda: ytdl.extract_info(f"ytsearch:{search}", download=(not stream))['entries'][0])
 
-      song = data['formats'][0]['url'] if stream else ytdl.prepare_filename(data)
+      song = data['url'] if stream else ytdl.prepare_filename(data)
       player = FFmpegPCMAudio(song, **ffmpeg_options)
 
+      # Check if Bot is connected to a channel
       if voice_clients[interaction.guild.id] != None:
-         voice_clients[interaction.guild.id].play(player)
+         # Check if Bot is not already playing
+         if not voice_clients[interaction.guild.id].is_playing():
+            voice_clients[interaction.guild.id].play(player)
+         # If Bot is currently playing stop playback and start new playback
+         else:
+            voice_clients[interaction.guild.id].stop()
+            voice_clients[interaction.guild.id].play(player)
       else:
          return await interaction.followup.send("Not connected to a channel. Use /join first")
 
