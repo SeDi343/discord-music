@@ -8,7 +8,7 @@ import requests
 import traceback
 #from youtube_dl import YoutubeDL
 from yt_dlp import YoutubeDL
-from discord import app_commands, Intents, Client, Interaction, Status, Game, FFmpegPCMAudio
+from discord import app_commands, Intents, Client, Interaction, Status, Game, FFmpegPCMAudio, PCMVolumeTransformer
 
 #########################################################################################
 # Requirements for Discord Bot
@@ -183,6 +183,29 @@ async def _init_command_search_response(interaction, search):
       return await interaction.followup.send("Can not start Playback.")
 
 
+# Function to change volume
+async def _init_command_volume_response(interaction, volume):
+   """The function to change volume"""
+   try:
+      # Respond in the console that the command has been ran
+      print(f"> {interaction.guild} : {interaction.user} used the volume command.")
+
+      # Tell Discord that request takes some time
+      await interaction.response.defer()
+
+      if 0 <= volume <= 100:
+         if voice_clients.setdefault(interaction.guild.id) != None and voice_clients[interaction.guild.id].is_playing():
+            voice_clients[interaction.guild.id].source = PCMVolumeTransformer(voice_clients[interaction.guild.id].source, volume=volume/100)
+         else:
+            return await interaction.followup.send(f"Bot needs to be connected first and play a Song.")
+      else:
+         return await interaction.followup.send(f"Volume must be between 0-100%")
+
+      await interaction.followup.send(f"Changed Volume to {volume}%")
+   except Exception:
+      print(f" > Exception occured processing volume command: {traceback.print_exc()}")
+      return await interaction.followup.send("Can not change Volume.")
+
 # Function to pause
 async def _init_command_pause_response(interaction):
    """The function to pause"""
@@ -277,6 +300,12 @@ async def play(interaction: Interaction, url: str):
 async def search(interaction: Interaction, search: str):
    """A command to search youtube"""
    await _init_command_search_response(interaction, search)
+
+# Command to change volume
+@client.tree.command()
+async def volume(interaction: Interaction, volume: float):
+   """A command to change volume"""
+   await _init_command_volume_response(interaction, volume)
 
 # Command to pause
 @client.tree.command()
