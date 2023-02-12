@@ -195,13 +195,14 @@ async def _init_command_volume_response(interaction, volume):
 
       if 0 <= volume <= 100:
          if voice_clients.setdefault(interaction.guild.id) != None and voice_clients[interaction.guild.id].is_playing():
-            voice_clients[interaction.guild.id].source = PCMVolumeTransformer(voice_clients[interaction.guild.id].source, volume=volume/100)
+            voice_clients[interaction.guild.id].source = PCMVolumeTransformer(voice_clients[interaction.guild.id].source)
+            voice_clients[interaction.guild.id].source.volume = volume/100
          else:
             return await interaction.followup.send(f"Bot needs to be connected first and play a Song.")
       else:
-         return await interaction.followup.send(f"Volume must be between 0-100%")
+         return await interaction.followup.send(f"Value must be between 0-100%")
 
-      await interaction.followup.send(f"Changed Volume to {volume}%")
+      await interaction.followup.send(f"Reduced Volume by {volume}%")
    except Exception:
       print(f" > Exception occured processing volume command: {traceback.print_exc()}")
       return await interaction.followup.send("Can not change Volume.")
