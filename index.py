@@ -40,7 +40,7 @@ print("\n".join([
 yt_dl_opts = {
    'format': 'm4a/bestaudio/best',
    'outtmpl': 'download/%(id)s',
-   'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'
+   'before_options': '-reconnect 1 -reconnect_at_eof 1 -reconnect_streamed 1 -reconnect_delay_max 2'
 }
 ytdl = YoutubeDL(yt_dl_opts)
 stream = False
@@ -97,6 +97,8 @@ async def _init_command_join_response(interaction):
       await interaction.response.defer()
 
       # Connect to Users Channel
+      if voice_clients.setdefault(interaction.guild.id) != None:
+         await voice_clients[interaction.guild.id].disconnect()
       voice_client = await interaction.user.voice.channel.connect()
       voice_clients[voice_client.guild.id] = voice_client
 
@@ -196,7 +198,7 @@ async def _init_command_pause_response(interaction):
       await interaction.followup.send("Pausing Playback")
    except Exception:
       print(f" > Exception occured processing pause command: {traceback.print_exc()}")
-      return await interaction.folloup.send("Can not pause Playback.")
+      return await interaction.followup.send("Can not pause Playback.")
 
 
 # Function to resume
@@ -214,7 +216,7 @@ async def _init_command_resume_response(interaction):
       await interaction.followup.send("Resuming Playback")
    except Exception:
       print(f" > Exception occured processing resume command: {traceback.print_exc()}")
-      return await interaction.folloup.send("Can not resume Playback.")
+      return await interaction.followup.send("Can not resume Playback.")
 
 
 # Function to stop
@@ -232,7 +234,7 @@ async def _init_command_stop_response(interaction):
       await interaction.followup.send("Stop Playback")
    except Exception:
       print(f" > Exception occured processing stop command: {traceback.print_exc()}")
-      return await interaction.folloup.send("Can not stop Playback.")
+      return await interaction.followup.send("Can not stop Playback.")
 
 
 # Function to disconnect
@@ -245,12 +247,14 @@ async def _init_command_disconnect_response(interaction):
       # Tell Discord that request takes some time
       await interaction.response.defer()
 
+      if voice_clients[interaction.guild.id].is_playing():
+         voice_clients[interaction.guild.id].stop()
       await voice_clients[interaction.guild.id].disconnect()
 
       await interaction.followup.send("Disconnected")
    except Exception:
       print(f" > Exception occured processing disconnect command: {traceback.print_exc()}")
-      return await interaction.folloup.send(f"Can not disconnect from channel {interaction.user.voice.channel.name}.")
+      return await interaction.followup.send(f"Can not disconnect from channel {interaction.user.voice.channel.name}.")
 
 #########################################################################################
 # Commands
