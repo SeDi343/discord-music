@@ -125,7 +125,7 @@ async def _init_command_play_response(interaction, url):
       data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=(not stream)))
 
       song = data['url'] if stream else ytdl.prepare_filename(data)
-      player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = 0.05)
+      player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = 0.03)
 
       # Check if Bot is connected to a channel
       if voice_clients[interaction.guild.id] != None:
@@ -162,7 +162,7 @@ async def _init_command_search_response(interaction, search):
       data = await loop.run_in_executor(None, lambda: ytdl.extract_info(f"ytsearch:{search}", download=(not stream))['entries'][0])
 
       song = data['url'] if stream else ytdl.prepare_filename(data)
-      player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = 0.05)
+      player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = 0.03)
 
       # Check if Bot is connected to a channel
       if voice_clients[interaction.guild.id] != None:
