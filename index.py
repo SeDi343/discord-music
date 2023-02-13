@@ -103,7 +103,7 @@ async def _init_command_join_response(interaction):
       voice_clients[voice_client.guild.id] = voice_client
 
       # Write in Chat that Bot joined channel
-      await interaction.followup.send(f"Joined Channel \"{interaction.user.voice.channel.name}\"")
+      await interaction.followup.send(f"Joined Channel **{interaction.user.voice.channel.name}**")
    except Exception:
       print(f" > Exception occured processing join command: {traceback.print_exc()}")
       return await interaction.followup.send("Unable to Join Channel. Make sure you are in a Voice Channel.")
@@ -125,7 +125,7 @@ async def _init_command_play_response(interaction, url):
       data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=(not stream)))
 
       song = data['url'] if stream else ytdl.prepare_filename(data)
-      player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = 0.2)
+      player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = 0.05)
 
       # Check if Bot is connected to a channel
       if voice_clients[interaction.guild.id] != None:
@@ -139,7 +139,7 @@ async def _init_command_play_response(interaction, url):
       else:
          return await interaction.followup.send("Not connected to a channel. Use /join first")
 
-      await interaction.followup.send(f"Start playing: \"{data['title']}\"")
+      await interaction.followup.send(f"Start playing: **{data['title']}** (`{data['duration_string']}`)")
 
    except Exception:
       print(f" > Exception occured processing play command: {traceback.print_exc()}")
@@ -162,7 +162,7 @@ async def _init_command_search_response(interaction, search):
       data = await loop.run_in_executor(None, lambda: ytdl.extract_info(f"ytsearch:{search}", download=(not stream))['entries'][0])
 
       song = data['url'] if stream else ytdl.prepare_filename(data)
-      player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = 0.2)
+      player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = 0.05)
 
       # Check if Bot is connected to a channel
       if voice_clients[interaction.guild.id] != None:
@@ -176,7 +176,7 @@ async def _init_command_search_response(interaction, search):
       else:
          return await interaction.followup.send("Not connected to a channel. Use /join first")
 
-      await interaction.followup.send(f"Start playing: \"{data['title']}\"")
+      await interaction.followup.send(f"Start playing: **{data['title']}** (`{data['duration_string']}`)")
 
    except Exception:
       print(f" > Exception occured processing search command: {traceback.print_exc()}")
@@ -200,9 +200,9 @@ async def _init_command_volume_response(interaction, volume):
          else:
             return await interaction.followup.send(f"Bot is not playing anything.")
       else:
-         return await interaction.followup.send(f"Value must be between 0-100%")
+         return await interaction.followup.send(f"Value must be between **0-100%**")
 
-      await interaction.followup.send(f"Changed Volume to {volume}%")
+      await interaction.followup.send(f"Changed Volume to **{volume}**%")
    except Exception:
       print(f" > Exception occured processing volume command: {traceback.print_exc()}")
       return await interaction.followup.send("Can not change Volume.")
