@@ -46,7 +46,9 @@ ytdl = YoutubeDL(yt_dl_opts)
 stream = False
 
 # Configurations for FFMPEG
-ffmpeg_options = {'options': "-vn"}
+ffmpeg_options = {
+   'options': "-vn"
+}
 
 # Variable for multiple voice clients in different guilds
 voice_clients = {}
