@@ -82,7 +82,7 @@ async def on_ready():
         f"https://discord.com/api/oauth2/authorize?client_id={client.user.id}&scope=applications.commands%20bot"
     ]))
 
-    await client.change_presence(status=Status.online, activity=Game(name="Ready for The Imperial March!"))
+    await client.change_presence(status=Status.online, activity=Game(name="You don't regret the things you did wrong as much as the ones you didn't even try."))
 
 #########################################################################################
 # Functions
@@ -282,6 +282,23 @@ async def _init_command_disconnect_response(interaction):
       print(f" > Exception occured processing disconnect command: {traceback.print_exc()}")
       return await interaction.followup.send(f"Can not disconnect from channel {interaction.user.voice.channel.name}.")
 
+
+# Function to send donation response
+async def _init_command_donation_response(interaction):
+   """The function to send donation link"""
+   try:
+      # Respond in the console that the command has been ran
+      print(f"> {interaction.guild} : {interaction.user} used the donation command.")
+
+      donationlink = config_data.get("donation_link")
+
+      await interaction.response.send_message("\n".join([
+         f"Hey {interaction.user.mention}, thank you for considering donating to support my work!",
+         f"You can donate via PayPal using {donationlink} :heart_hands:"]))
+   except Exception:
+      print(f" > Exception occured processing donation command: {traceback.print_exc()}")
+      return await interaction.response.send_message(f"Can not process donation command. Please contact <@164129430766092289> when this happened.")
+
 #########################################################################################
 # Commands
 #########################################################################################
@@ -333,6 +350,18 @@ async def stop(interaction: Interaction):
 async def disconnect(interaction: Interaction):
    """A command to disconnect"""
    await _init_command_disconnect_response(interaction)
+
+# Command to leave
+@client.tree.command()
+async def leave(interaction: Interaction):
+   """A command to leave"""
+   await _init_command_disconnect_response(interaction)
+
+# Command for Donation
+@client.tree.command()
+async def donate(interaction: Interaction):
+   """A command to send donation link"""
+   await _init_command_donation_response(interaction)
 
 #########################################################################################
 # Server Start
