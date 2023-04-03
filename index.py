@@ -105,7 +105,8 @@ async def _init_command_help_response(interaction):
          "**\\pause** - Pause the current Playback to continue Playback later.",
          "**\\resume** - Resume paused Playback.",
          "**\\stop** - Stops current Playback.",
-         "**\\disconnect** or **\\leave** - Remove Bot from Playback Channel."
+         "**\\disconnect** or **\\leave** - Remove Bot from Playback Channel.",
+         f"**\\donation** - A link to support the creator of {client.user}",
       ]))
    except Exception:
       print(f" > Exception occured processing help command: {traceback.print_exc()}")
