@@ -88,6 +88,29 @@ async def on_ready():
 # Functions
 #########################################################################################
 
+# Function to check out all available commands
+async def _init_command_help_response(interaction):
+   """The function to check help"""
+   try:
+      # Respond in the console that the command has been ran
+      print(f"> {interaction.guild} : {interaction.user} used the help command.")
+
+      await interaction.response.send_message("\n".join([
+         f"Awailable Commands for {client.user}:",
+         "**\\help** - Shows this Message.",
+         "**\\join** - Let\'s the user join into Users Channel.",
+         "**\\play url** - Start Playback of Youtube URL.",
+         "**\\search string** - Search Youtube and play first Video from Search.",
+         "**\\volume 0-100** - Change Volume of Playback. Default is 3.",
+         "**\\pause** - Pause the current Playback to continue Playback later.",
+         "**\\resume** - Resume paused Playback.",
+         "**\\stop** - Stops current Playback.",
+         "**\\disconnect** or **\\leave** - Remove Bot from Playback Channel."
+      ]))
+   except Exception:
+      print(f" > Exception occured processing help command: {traceback.print_exc()}")
+      return await interaction.response.send_message(f"Can not process help command. Please contact <@164129430766092289> when this happened.")
+
 # Function to join channel
 async def _init_command_join_response(interaction):
    """The function to join a channel"""
@@ -209,6 +232,7 @@ async def _init_command_volume_response(interaction, volume):
       print(f" > Exception occured processing volume command: {traceback.print_exc()}")
       return await interaction.followup.send("Can not change Volume.")
 
+
 # Function to pause
 async def _init_command_pause_response(interaction):
    """The function to pause"""
@@ -302,6 +326,12 @@ async def _init_command_donation_response(interaction):
 #########################################################################################
 # Commands
 #########################################################################################
+
+# Command to check help
+@client.tree.command()
+async def help(interaction: Interaction):
+   """Help Command for Music Bot"""
+   await _init_command_help_response(interaction)
 
 # Command to join a users channel
 @client.tree.command()
