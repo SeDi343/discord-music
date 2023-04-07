@@ -96,7 +96,7 @@ async def _init_command_help_response(interaction):
       print(f"> {interaction.guild} : {interaction.user} used the help command.")
 
       await interaction.response.send_message("\n".join([
-         f"Awailable Commands for {client.user}:",
+         f"Available Commands for {client.user.mention}:",
          "**\\help** - Shows this Message.",
          "**\\join** - Let\'s the user join into Users Channel.",
          "**\\play url** - Start Playback of Youtube URL.",
@@ -106,7 +106,7 @@ async def _init_command_help_response(interaction):
          "**\\resume** - Resume paused Playback.",
          "**\\stop** - Stops current Playback.",
          "**\\disconnect** or **\\leave** - Remove Bot from Playback Channel.",
-         f"**\\donation** - A link to support the creator of {client.user}",
+         f"**\\donation** - A link to support the creator of {client.user.mention}",
       ]))
    except Exception:
       print(f" > Exception occured processing help command: {traceback.print_exc()}")
