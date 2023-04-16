@@ -145,6 +145,16 @@ async def _init_command_play_response(interaction, url):
       # Tell Discord that request takes some time
       await interaction.response.defer()
 
+      # If URL contains spotify link print out this exception.
+      if "spotify.com" in url:
+         await interaction.followup.send("Unable to start Spotify Playback. Currently only Youtube is supported.")
+         return
+
+      # If no Youtube URL is given
+      if not any(substring in url for substring in ["youtube.com", "youtu.be"]):
+         await interaction.followup.send("Youtube URL is required for this command. Use **/search** if you want to search for a song.")
+         return
+
       # Similar to a Thread it will run independent from the program. Sent command will only
       # effect current user session
       loop = asyncio.get_event_loop()
