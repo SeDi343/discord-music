@@ -175,6 +175,11 @@ async def _init_command_play_response(interaction, url):
          await interaction.followup.send("Unable to start Spotify Playback. Currently only Youtube is supported.")
          return
 
+      # Check if user parsed a youtube list.
+      if "&list=" in url:
+         await interaction.followup.send("Can not add Youtube Playlists to Bot.")
+         return
+
       # If no Youtube URL is given
       if not any(substring in url for substring in ["youtube.com", "youtu.be"]):
          await interaction.followup.send("Youtube URL is required for this command. Use **/search** if you want to search for a song.")
