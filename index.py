@@ -352,7 +352,7 @@ async def _init_command_queue_response(interaction):
       return await interaction.followup.send("Can not print out queued songs.")
 
 # Function to change volume
-async def _init_command_volume_response(interaction, volume_local):
+async def _init_command_volume_response(interaction, volume):
    """The function to change volume"""
    try:
       # Respond in the console that the command has been ran
@@ -361,9 +361,9 @@ async def _init_command_volume_response(interaction, volume_local):
       # Tell Discord that request takes some time
       await interaction.response.defer()
 
-      if 0 <= volume_local <= 100:
+      if 0 <= volume <= 100:
          if voice_clients[interaction.guild.id].is_playing():
-            volume_val[interaction.guild.id] = volume_local / 100
+            volume_val[interaction.guild.id] = volume / 100
             voice_clients[interaction.guild.id].source.volume = volume_val[interaction.guild.id]
          else:
             return await interaction.followup.send(f"Bot is not playing anything.")
@@ -533,9 +533,9 @@ async def list(interaction: Interaction):
 
 # Command to change volume
 @client.tree.command()
-async def volume(interaction: Interaction, volume_local: float):
+async def volume(interaction: Interaction, volume: float):
    """A command to change volume"""
-   await _init_command_volume_response(interaction, volume_local)
+   await _init_command_volume_response(interaction, volume)
 
 # Command to pause
 @client.tree.command()
