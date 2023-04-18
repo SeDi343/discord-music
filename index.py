@@ -56,6 +56,8 @@ voice_clients = {}
 # Variable for queue
 queues = {}
 
+# Was connected variable
+
 # Main Class for Discord
 class MusicBot(Client):
    def __init__(self):
@@ -256,11 +258,10 @@ async def _init_command_next_response(interaction):
       # Check if Bot is connected to a channel
       if voice_clients[interaction.guild.id] != None:
          # Check if Bot is playing something and there are songs in the queue start playback of next song
-         if voice_clients[interaction.guild.id].is_playing() and queues[interaction.guild.id]:
-            voice_clients[interaction.guild.id].stop()
-            await asyncio.sleep(0.5)
+         if len(queues[interaction.guild.id]) > 0:
+            if voice_clients[interaction.guild.id].is_playing():
+               voice_clients[interaction.guild.id].stop()
             await interaction.followup.send(f"Start playing: **{queues[interaction.guild.id][0]['title']}** (`{queues[interaction.guild.id][0]['duration']}`)")
-            return _play_next_song(interaction.guild.id)
          else:
             return await interaction.followup.send("There are no queued songs")
       else:
@@ -269,6 +270,30 @@ async def _init_command_next_response(interaction):
    except Exception:
       print(f" > Exception occured processing next command: {traceback.print_exc()}")
       return await interaction.followup.send("Can not skip track.")
+
+
+# Function to print out List of Queue
+async def _init_command_queue_response(interaction):
+   """The fucntion to list all queued songs"""
+   try:
+      # Respond in the console that the command has been ran
+      print(f"> {interaction.guild} : {interaction.user} used the queue command.")
+
+      # Tell Discord that request takes some time
+      await interaction.response.defer()
+
+      queue_string = ""
+
+      if len(queues[interaction.guild.id]) > 0:
+         for i,item in enumerate(queues[interaction.guild.id]):
+            queue_string += f"{i} **{item['title']}** (`{item['duration']}`)\n"
+         return await interaction.followup.send(queue_string)
+      else:
+         return await interaction.followup.send("No Songs in Queue")
+
+   except Exception:
+      print(f" > Exception occured processing queue command: {traceback.print_exc()}")
+      return await interaction.followup.send("Can not print out queued songs.")
 
 # Function to change volume
 async def _init_command_volume_response(interaction, volume):
@@ -425,6 +450,12 @@ async def search(interaction: Interaction, search: str):
 async def next(interaction: Interaction):
    """A command to play next track in queue"""
    await _init_command_next_response(interaction)
+
+# Command to check queue
+@client.tree.command()
+async def queue(interaction: Interaction):
+   """A command to check the current queued songs"""
+   await _init_command_queue_response(interaction)
 
 # Command to change volume
 @client.tree.command()
