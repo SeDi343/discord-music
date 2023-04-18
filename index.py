@@ -204,6 +204,9 @@ async def _init_command_play_response(interaction, url):
 
       await interaction.followup.send(f"Start playing: **{data['title']}** (`{data['duration_string']}`)")
 
+   except KeyError:
+      print(f" > Exception occured processing play command: {traceback.print_exc()}")
+      return await interaction.followup.send("Not connected to a channel. Use **/join** first!")
    except Exception:
       print(f" > Exception occured processing play command: {traceback.print_exc()}")
       return await interaction.followup.send("Can not start Playback.")
@@ -248,6 +251,9 @@ async def _init_command_search_response(interaction, search):
 
       await interaction.followup.send(f"Start playing: **{data['title']}** (`{data['duration_string']}`)")
 
+   except KeyError:
+      print(f" > Exception occured processing play command: {traceback.print_exc()}")
+      return await interaction.followup.send("Not connected to a channel. Use **/join** first!")
    except Exception:
       print(f" > Exception occured processing search command: {traceback.print_exc()}")
       return await interaction.followup.send("Can not start Playback.")
