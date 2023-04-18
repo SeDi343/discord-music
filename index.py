@@ -53,6 +53,9 @@ ffmpeg_options = {
 # Variable for multiple voice clients in different guilds
 voice_clients = {}
 
+# Variable for queue
+queues = {}
+
 # Main Class for Discord
 class MusicBot(Client):
    def __init__(self):
@@ -159,6 +162,10 @@ async def _init_command_play_response(interaction, url):
       # effect current user session
       loop = asyncio.get_event_loop()
       data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=(not stream)))
+
+      # Check if queue for voice channel does already exist. If not create one
+      if voice_clients[interaction.guild.id] not in queues:
+         queues[interaction.guild.id] = []
 
       song = data['url'] if stream else ytdl.prepare_filename(data)
       player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = 0.03)
