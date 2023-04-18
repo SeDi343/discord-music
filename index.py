@@ -91,7 +91,8 @@ async def on_ready():
         f"https://discord.com/api/oauth2/authorize?client_id={client.user.id}&scope=applications.commands%20bot"
     ]))
 
-    await client.change_presence(status=Status.online, activity=Game(name="You don't regret the things you did wrong as much as the ones you didn't even try."))
+    #await client.change_presence(status=Status.online, activity=Game(name="You don't regret the things you did wrong as much as the ones you didn't even try."))
+    await client.change_presence(status=Status.online, activity=Game(name="Update: Can now queue up songs for you :)"))
 
 #########################################################################################
 # Functions
