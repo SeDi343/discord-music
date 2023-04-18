@@ -175,10 +175,6 @@ async def _init_command_play_response(interaction, url):
          await interaction.followup.send("Youtube URL is required for this command. Use **/search** if you want to search for a song.")
          return
 
-      # Check if queue for voice channel does already exist. If not create one
-      if queues[interaction.guild.id] == None:
-         queues[interaction.guild.id] = []
-
       # Similar to a Thread it will run independent from the program. Sent command will only
       # effect current user session
       loop = asyncio.get_event_loop()
@@ -187,11 +183,16 @@ async def _init_command_play_response(interaction, url):
       song = data['url'] if stream else ytdl.prepare_filename(data)
       player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = 0.03)
 
-      # Add player to queue
-      queues[interaction.guild.id].append({'player': player, 'title': data['title'], 'duration': data['duration_string']})
-
       # Check if Bot is connected to a channel
       if voice_clients[interaction.guild.id] != None:
+
+          # Check if queue for voice channel does already exist. If not create one
+         if queues[interaction.guild.id] == None:
+            queues[interaction.guild.id] = []
+
+         # Add player to queue
+         queues[interaction.guild.id].append({'player': player, 'title': data['title'], 'duration': data['duration_string']})
+
          # Check if Bot is not already playing
          if not voice_clients[interaction.guild.id].is_playing() and queues[interaction.guild.id]:
             voice_clients[interaction.guild.id].play(queues[interaction.guild.id][0]['player'], after=lambda _: _play_next_song(interaction.guild.id))
@@ -218,10 +219,6 @@ async def _init_command_search_response(interaction, search):
       # Tell Discord that request takes some time
       await interaction.response.defer()
 
-      # Check if queue for voice channel does already exist. If not create one
-      if queues[interaction.guild.id] == None:
-         queues[interaction.guild.id] = []
-
       # Similar to a Thread it will run independent from the program. Sent command will only
       # effect current user session
       loop = asyncio.get_event_loop()
@@ -230,11 +227,16 @@ async def _init_command_search_response(interaction, search):
       song = data['url'] if stream else ytdl.prepare_filename(data)
       player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = 0.03)
 
-      # Add player to queue
-      queues[interaction.guild.id].append({'player': player, 'title': data['title'], 'duration': data['duration_string']})
-
       # Check if Bot is connected to a channel
       if voice_clients[interaction.guild.id] != None:
+
+          # Check if queue for voice channel does already exist. If not create one
+         if queues[interaction.guild.id] == None:
+            queues[interaction.guild.id] = []
+
+         # Add player to queue
+         queues[interaction.guild.id].append({'player': player, 'title': data['title'], 'duration': data['duration_string']})
+
          # Check if Bot is not playing something and song is in queue
          if not voice_clients[interaction.guild.id].is_playing() and queues[interaction.guild.id]:
             voice_clients[interaction.guild.id].play(queues[interaction.guild.id][0]['player'], after=lambda _: _play_next_song(interaction.guild.id))
