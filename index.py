@@ -105,8 +105,10 @@ async def _init_command_help_response(interaction):
          f"Available Commands for {client.user.mention}:",
          "**\\help** - Shows this Message.",
          "**\\join** - Let\'s the user join into Users Channel.",
-         "**\\play url** - Start Playback of Youtube URL.",
-         "**\\search string** - Search Youtube and play first Video from Search.",
+         "**\\play url** - Start playback of Youtube URL or add it to queue if playback already started.",
+         "**\\search string** - Search Youtube and play first Video from Search or add it to queue if playback already started.",
+         "**\\next** or **\\skip** - Skip current playback and continue with next song in the queue.",
+         "**\\queue** or **\\list** - Print out the currently listed queue of songs",
          "**\\volume 0-100** - Change Volume of Playback. Default is 3.",
          "**\\pause** - Pause the current Playback to continue Playback later.",
          "**\\resume** - Resume paused Playback.",
@@ -458,9 +460,21 @@ async def next(interaction: Interaction):
    """A command to play next track in queue"""
    await _init_command_next_response(interaction)
 
+# Command to play next track
+@client.tree.command()
+async def skip(interaction: Interaction):
+   """A command to play next track in queue"""
+   await _init_command_next_response(interaction)
+
 # Command to check queue
 @client.tree.command()
 async def queue(interaction: Interaction):
+   """A command to check the current queued songs"""
+   await _init_command_queue_response(interaction)
+
+# Command to check queue
+@client.tree.command()
+async def list(interaction: Interaction):
    """A command to check the current queued songs"""
    await _init_command_queue_response(interaction)
 
