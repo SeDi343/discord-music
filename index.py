@@ -197,7 +197,7 @@ async def _init_command_play_response(interaction, url):
             voice_clients[interaction.guild.id].play(queues[interaction.guild.id][0]['player'], after=lambda _: _play_next_song(interaction.guild.id))
             new_queue[interaction.guild.id] = True
          else:
-            return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])} Songs queued")
+            return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])-1} Songs queued")
       else:
          return await interaction.followup.send("Not connected to a channel. Use **/join** first")
 
@@ -240,7 +240,7 @@ async def _init_command_search_response(interaction, search):
             voice_clients[interaction.guild.id].play(queues[interaction.guild.id][0]['player'], after=lambda _: _play_next_song(interaction.guild.id))
             new_queue[interaction.guild.id] = True
          else:
-            return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])} Songs queued")
+            return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])-1} Songs queued")
       else:
          return await interaction.followup.send("Not connected to a channel. Use **/join** first")
 
