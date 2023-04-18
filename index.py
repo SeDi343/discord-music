@@ -56,7 +56,8 @@ voice_clients = {}
 # Variable for queue
 queues = {}
 
-# Was connected variable
+# New queue
+new_queue = {}
 
 # Main Class for Discord
 class MusicBot(Client):
@@ -122,6 +123,7 @@ async def _init_command_help_response(interaction):
 def _play_next_song(guild):
    if queues[guild]:
       player = queues[guild].pop(0)
+      new_queue[guild] = False
       voice_clients[guild].play(player['player'], after=lambda _: _play_next_song(guild))
 
 
@@ -191,6 +193,7 @@ async def _init_command_play_response(interaction, url):
          # Check if Bot is not already playing
          if not voice_clients[interaction.guild.id].is_playing() and queues[interaction.guild.id]:
             voice_clients[interaction.guild.id].play(queues[interaction.guild.id][0]['player'], after=lambda _: _play_next_song(interaction.guild.id))
+            new_queue[interaction.guild.id] = True
          else:
             return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])} Songs queued")
       else:
@@ -233,6 +236,7 @@ async def _init_command_search_response(interaction, search):
          # Check if Bot is not playing something and song is in queue
          if not voice_clients[interaction.guild.id].is_playing() and queues[interaction.guild.id]:
             voice_clients[interaction.guild.id].play(queues[interaction.guild.id][0]['player'], after=lambda _: _play_next_song(interaction.guild.id))
+            new_queue[interaction.guild.id] = True
          else:
             return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])} Songs queued")
       else:
@@ -261,7 +265,10 @@ async def _init_command_next_response(interaction):
          if len(queues[interaction.guild.id]) > 0:
             if voice_clients[interaction.guild.id].is_playing():
                voice_clients[interaction.guild.id].stop()
-            await interaction.followup.send(f"Start playing: **{queues[interaction.guild.id][0]['title']}** (`{queues[interaction.guild.id][0]['duration']}`)")
+            if new_queue[interaction.guild.id] == True:
+               return await interaction.followup.send(f"Start playing: **{queues[interaction.guild.id][1]['title']}** (`{queues[interaction.guild.id][1]['duration']}`)")
+            else:
+               return await interaction.followup.send(f"Start playing: **{queues[interaction.guild.id][0]['title']}** (`{queues[interaction.guild.id][0]['duration']}`)")
          else:
             return await interaction.followup.send("There are no queued songs")
       else:
