@@ -198,7 +198,10 @@ async def _init_command_play_response(interaction, url):
             voice_clients[interaction.guild.id].play(queues[interaction.guild.id][0]['player'], after=lambda _: _play_next_song(interaction.guild.id))
             new_queue[interaction.guild.id] = True
          else:
-            return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])-1} Songs queued")
+            if new_queue[interaction.guild.id] == True:
+               return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])-1} Songs queued")
+            else:
+               return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])} Songs queued")
       else:
          return await interaction.followup.send("Not connected to a channel. Use **/join** first")
 
@@ -245,7 +248,10 @@ async def _init_command_search_response(interaction, search):
             voice_clients[interaction.guild.id].play(queues[interaction.guild.id][0]['player'], after=lambda _: _play_next_song(interaction.guild.id))
             new_queue[interaction.guild.id] = True
          else:
-            return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])-1} Songs queued")
+            if new_queue[interaction.guild.id] == True:
+               return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])-1} Songs queued")
+            else:
+               return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])} Songs queued")
       else:
          return await interaction.followup.send("Not connected to a channel. Use **/join** first")
 
@@ -312,7 +318,7 @@ async def _init_command_queue_response(interaction):
       else:
          if len(queues[interaction.guild.id]) > 0:
             for i,item in enumerate(queues[interaction.guild.id]):
-               queue_string += f"{i} **{item['title']}** (`{item['duration']}`)\n"
+               queue_string += f"{i+1} **{item['title']}** (`{item['duration']}`)\n"
             return await interaction.followup.send(queue_string)
          else:
             return await interaction.followup.send("No Songs in Queue")
