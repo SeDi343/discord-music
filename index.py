@@ -8,7 +8,7 @@ import requests
 import traceback
 #from youtube_dl import YoutubeDL
 from yt_dlp import YoutubeDL
-from discord import app_commands, Intents, Client, Interaction, Status, Game, FFmpegPCMAudio, PCMVolumeTransformer
+from discord import app_commands, Intents, Client, Interaction, Status, Game, FFmpegPCMAudio, FFmpegOpusAudio, PCMVolumeTransformer
 
 #########################################################################################
 # Requirements for Discord Bot
@@ -120,7 +120,7 @@ async def _init_command_help_response(interaction):
 def _play_next_song(guild):
    if queues[guild]:
       player = queues[guild].pop(0)
-      voice_clients[guild].play(player[0]['player'], after=lambda _: _play_next_song(guild))
+      voice_clients[guild].play(player['player'], after=lambda _: _play_next_song(guild))
 
 # Private Function to stop playback and start playback of next song in queue
 def _play_force_next_song(guild):
@@ -128,7 +128,7 @@ def _play_force_next_song(guild):
       if voice_clients[guild].is_playing():
          voice_clients[guild].stop()
       player = queues[guild].pop(0)
-      voice_clients[guild].play(player[0]['player'], after=lambda _: _play_next_song(guild))
+      voice_clients[guild].play(player['player'], after=lambda _: _play_next_song(guild))
 
 # Function to join channel
 async def _init_command_join_response(interaction):
@@ -177,7 +177,7 @@ async def _init_command_play_response(interaction, url):
          return
 
       # Check if queue for voice channel does already exist. If not create one
-      if voice_clients[interaction.guild.id] not in queues:
+      if queues[interaction.guild.id] == None:
          queues[interaction.guild.id] = []
 
       # Similar to a Thread it will run independent from the program. Sent command will only
@@ -197,7 +197,7 @@ async def _init_command_play_response(interaction, url):
          if not voice_clients[interaction.guild.id].is_playing() and queues[interaction.guild.id]:
             voice_clients[interaction.guild.id].play(queues[interaction.guild.id][0]['player'], after=lambda _: _play_next_song(interaction.guild.id))
          else:
-            return await interaction.followup.send(f"Queued **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])} Songs queued")
+            return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])} Songs queued")
       else:
          return await interaction.followup.send("Not connected to a channel. Use **/join** first")
 
@@ -219,7 +219,7 @@ async def _init_command_search_response(interaction, search):
       await interaction.response.defer()
 
       # Check if queue for voice channel does already exist. If not create one
-      if voice_clients[interaction.guild.id] not in queues:
+      if queues[interaction.guild.id] == None:
          queues[interaction.guild.id] = []
 
       # Similar to a Thread it will run independent from the program. Sent command will only
@@ -239,7 +239,7 @@ async def _init_command_search_response(interaction, search):
          if not voice_clients[interaction.guild.id].is_playing() and queues[interaction.guild.id]:
             voice_clients[interaction.guild.id].play(queues[interaction.guild.id][0]['player'], after=lambda _: _play_next_song(interaction.guild.id))
          else:
-            return await interaction.followup.send(f"Queued **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])} Songs queued")
+            return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])} Songs queued")
       else:
          return await interaction.followup.send("Not connected to a channel. Use **/join** first")
 
@@ -264,13 +264,12 @@ async def _init_command_next_response(interaction):
       if voice_clients[interaction.guild.id] != None:
          # Check if Bot is playing something and there are songs in the queue start playback of next song
          if voice_clients[interaction.guild.id].is_playing() and queues[interaction.guild.id]:
+            await interaction.followup.send(f"Start playing: **{queues[interaction.guild.id][0]['title']}** (`{queues[interaction.guild.id][0]['duration']}`)")
             _play_force_next_song(interaction.guild.id)
          else:
             return await interaction.followup.send("There are no queued songs")
       else:
          return await interaction.followup.send("Not connected to a channel. Use **/join** first")
-
-      await interaction.followup.send(f"Start playing: **{queues[interaction.guild.id][0]['title']}** (`{queues[interaction.guild.id][0]['duration']}`)")
 
    except Exception:
       print(f" > Exception occured processing next command: {traceback.print_exc()}")
