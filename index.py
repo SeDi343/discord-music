@@ -122,13 +122,6 @@ def _play_next_song(guild):
       player = queues[guild].pop(0)
       voice_clients[guild].play(player['player'], after=lambda _: _play_next_song(guild))
 
-# Private Function to stop playback and start playback of next song in queue
-def _play_force_next_song(guild):
-   if queues[guild]:
-      if voice_clients[guild].is_playing():
-         voice_clients[guild].stop()
-      player = queues[guild].pop(0)
-      voice_clients[guild].play(player['player'], after=lambda _: _play_next_song(guild))
 
 # Function to join channel
 async def _init_command_join_response(interaction):
@@ -264,8 +257,10 @@ async def _init_command_next_response(interaction):
       if voice_clients[interaction.guild.id] != None:
          # Check if Bot is playing something and there are songs in the queue start playback of next song
          if voice_clients[interaction.guild.id].is_playing() and queues[interaction.guild.id]:
+            voice_clients[interaction.guild.id].stop()
+            await asyncio.sleep(0.5)
             await interaction.followup.send(f"Start playing: **{queues[interaction.guild.id][0]['title']}** (`{queues[interaction.guild.id][0]['duration']}`)")
-            _play_force_next_song(interaction.guild.id)
+            return _play_next_song(interaction.guild.id)
          else:
             return await interaction.followup.send("There are no queued songs")
       else:
