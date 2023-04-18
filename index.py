@@ -301,12 +301,21 @@ async def _init_command_queue_response(interaction):
 
       queue_string = ""
 
-      if len(queues[interaction.guild.id]) > 0:
-         for i,item in enumerate(queues[interaction.guild.id]):
-            queue_string += f"{i} **{item['title']}** (`{item['duration']}`)\n"
-         return await interaction.followup.send(queue_string)
+      if new_queue[interaction.guild.id] == True:
+         if len(queues[interaction.guild.id]) > 0:
+            for i,item in enumerate(queues[interaction.guild.id]):
+               if i != 0:
+                  queue_string += f"{i} **{item['title']}** (`{item['duration']}`)\n"
+            return await interaction.followup.send(queue_string)
+         else:
+            return await interaction.followup.send("No Songs in Queue")
       else:
-         return await interaction.followup.send("No Songs in Queue")
+         if len(queues[interaction.guild.id]) > 0:
+            for i,item in enumerate(queues[interaction.guild.id]):
+               queue_string += f"{i} **{item['title']}** (`{item['duration']}`)\n"
+            return await interaction.followup.send(queue_string)
+         else:
+            return await interaction.followup.send("No Songs in Queue")
 
    except Exception:
       print(f" > Exception occured processing queue command: {traceback.print_exc()}")
