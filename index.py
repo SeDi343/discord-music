@@ -59,6 +59,9 @@ queues = {}
 # New queue
 new_queue = {}
 
+# Define a flag to indicate whether the bot should continue playing the next song
+should_continue = {}
+
 # Main Class for Discord
 class MusicBot(Client):
    def __init__(self):
@@ -123,11 +126,13 @@ async def _init_command_help_response(interaction):
 
 # Private Function to play next song in queue
 def _play_next_song(guild):
-   if queues[guild]:
-      player = queues[guild].pop(0)
-      new_queue[guild] = False
-      voice_clients[guild].play(player['player'], after=lambda _: _play_next_song(guild))
-
+   if should_continue[guild]:
+      if len(queues[guild]) > 0:
+         player = queues[guild].pop(0)
+         new_queue[guild] = False
+         voice_clients[guild].play(player['player'], after=lambda _: _play_next_song(guild))
+   else:
+      should_continue[guild]
 
 # Function to join channel
 async def _init_command_join_response(interaction):
@@ -190,6 +195,9 @@ async def _init_command_play_response(interaction, url):
          if queues[interaction.guild.id] == None:
             queues[interaction.guild.id] = []
 
+         # Tell Discord that it should continue playback
+         should_continue[interaction.guild.id] = True
+
          # Add player to queue
          queues[interaction.guild.id].append({'player': player, 'title': data['title'], 'duration': data['duration_string']})
 
@@ -239,6 +247,9 @@ async def _init_command_search_response(interaction, search):
           # Check if queue for voice channel does already exist. If not create one
          if queues[interaction.guild.id] == None:
             queues[interaction.guild.id] = []
+
+         # Tell Discord that it should continue playback
+         should_continue[interaction.guild.id] = True
 
          # Add player to queue
          queues[interaction.guild.id].append({'player': player, 'title': data['title'], 'duration': data['duration_string']})
@@ -398,10 +409,13 @@ async def _init_command_stop_response(interaction):
       # Tell Discord that request takes some time
       await interaction.response.defer()
 
-      voice_clients[interaction.guild.id].stop()
-
       # Delete list for the queued songs
       queues[interaction.guild.id] = []
+
+      # Set the flag to False to indicate that the bot should not continue playing songs
+      should_continue[interaction.guild.id] = False
+
+      voice_clients[interaction.guild.id].stop()
 
       await interaction.followup.send("Stop Playback")
    except Exception:
@@ -419,13 +433,16 @@ async def _init_command_disconnect_response(interaction):
       # Tell Discord that request takes some time
       await interaction.response.defer()
 
+      # Delete list for the queued songs
+      queues[interaction.guild.id] = []
+
+      # Set the flag to False to indicate that the bot should not continue playing songs
+      should_continue[interaction.guild.id] = False
+
       # Disconnect from the Channel
       if voice_clients[interaction.guild.id].is_playing():
          voice_clients[interaction.guild.id].stop()
       await voice_clients[interaction.guild.id].disconnect()
-
-      # Delete list for the queued songs
-      queues[interaction.guild.id] = []
 
       await interaction.followup.send("Disconnected")
    except Exception:
