@@ -39,15 +39,15 @@ print("\n".join([
 # Configurations for Youtube DL
 yt_dl_opts = {
    'format': 'm4a/bestaudio/best',
+   'noplaylist': 'True',
    'outtmpl': 'download/%(id)s',
-   'before_options': '-reconnect 1 -reconnect_at_eof 1 -reconnect_streamed 1 -reconnect_delay_max 2'
 }
 ytdl = YoutubeDL(yt_dl_opts)
 stream = False
 
 # Configurations for FFMPEG
 ffmpeg_options = {
-   'options': "-vn"
+   'options': '-vn'
 }
 
 # Variable for multiple voice clients in different guilds
