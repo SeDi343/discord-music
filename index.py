@@ -62,6 +62,9 @@ new_queue = {}
 # Define a flag to indicate whether the bot should continue playing the next song
 should_continue = {}
 
+# Variable for Volume
+volume = {}
+
 # Main Class for Discord
 class MusicBot(Client):
    def __init__(self):
@@ -132,6 +135,7 @@ def _play_next_song(guild):
          player = queues[guild].pop(0)
          new_queue[guild] = False
          voice_clients[guild].play(player['player'], after=lambda _: _play_next_song(guild))
+         voice_clients[guild].source.volume = volume[guild]
    else:
       should_continue[guild]
 
@@ -153,6 +157,9 @@ async def _init_command_join_response(interaction):
 
       # Create an empty list for the queued songs
       queues[interaction.guild.id] = []
+
+      # Set default volume level
+      volume[interaction.guild.id] = 0.01
 
       # Write in Chat that Bot joined channel
       await interaction.followup.send(f"Joined Channel **{interaction.user.voice.channel.name}**")
@@ -192,7 +199,7 @@ async def _init_command_play_response(interaction, url):
       data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=(not stream)))
 
       song = data['url'] if stream else ytdl.prepare_filename(data)
-      player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = 0.03)
+      player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = volume[interaction.guild.id])
 
       # Check if Bot is connected to a channel
       if voice_clients[interaction.guild.id] != None:
@@ -245,7 +252,7 @@ async def _init_command_search_response(interaction, search):
       data = await loop.run_in_executor(None, lambda: ytdl.extract_info(f"ytsearch:{search}", download=(not stream))['entries'][0])
 
       song = data['url'] if stream else ytdl.prepare_filename(data)
-      player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = 0.03)
+      player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = volume[interaction.guild.id])
 
       # Check if Bot is connected to a channel
       if voice_clients[interaction.guild.id] != None:
@@ -345,7 +352,7 @@ async def _init_command_queue_response(interaction):
       return await interaction.followup.send("Can not print out queued songs.")
 
 # Function to change volume
-async def _init_command_volume_response(interaction, volume):
+async def _init_command_volume_response(interaction, volume_local):
    """The function to change volume"""
    try:
       # Respond in the console that the command has been ran
@@ -354,10 +361,10 @@ async def _init_command_volume_response(interaction, volume):
       # Tell Discord that request takes some time
       await interaction.response.defer()
 
-      if 0 <= volume <= 100:
+      if 0 <= volume_local <= 100:
          if voice_clients[interaction.guild.id].is_playing():
-            new_volume = volume / 100
-            voice_clients[interaction.guild.id].source.volume = new_volume
+            volume[interaction.guild.id] = volume_local / 100
+            voice_clients[interaction.guild.id].source.volume = volume[interaction.guild.id]
          else:
             return await interaction.followup.send(f"Bot is not playing anything.")
       else:
@@ -526,9 +533,9 @@ async def list(interaction: Interaction):
 
 # Command to change volume
 @client.tree.command()
-async def volume(interaction: Interaction, volume: float):
+async def volume(interaction: Interaction, volume_local: float):
    """A command to change volume"""
-   await _init_command_volume_response(interaction, volume)
+   await _init_command_volume_response(interaction, volume_local)
 
 # Command to pause
 @client.tree.command()
