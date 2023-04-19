@@ -8,7 +8,7 @@ import requests
 import traceback
 #from youtube_dl import YoutubeDL
 from yt_dlp import YoutubeDL
-from discord import app_commands, Intents, Client, Interaction, Status, Game, FFmpegPCMAudio, FFmpegOpusAudio, PCMVolumeTransformer
+from discord import app_commands, Intents, Client, Interaction, Status, Game, FFmpegPCMAudio, errors, PCMVolumeTransformer
 
 #########################################################################################
 # Requirements for Discord Bot
@@ -228,7 +228,7 @@ async def _init_command_play_response(interaction, url):
 
       await interaction.followup.send(f"Start playing: **{data['title']}** (`{data['duration_string']}`)")
 
-   except KeyError:
+   except KeyError or errors.ClientException:
       print(f" > Exception occured processing play command: {traceback.print_exc()}")
       return await interaction.followup.send("Not connected to a channel. Use **/join** first!")
    except Exception:
@@ -281,7 +281,7 @@ async def _init_command_search_response(interaction, search):
 
       await interaction.followup.send(f"Start playing: **{data['title']}** (`{data['duration_string']}`)")
 
-   except KeyError:
+   except KeyError or errors.ClientException:
       print(f" > Exception occured processing play command: {traceback.print_exc()}")
       return await interaction.followup.send("Not connected to a channel. Use **/join** first!")
    except Exception:
