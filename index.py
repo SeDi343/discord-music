@@ -132,6 +132,11 @@ async def _init_command_help_response(interaction):
 
 
 # Private Function to play next song in queue
+"""
+No idea why the first song is not getting played twice. Because it starts playing it and adds it to the queue.
+After playback it takes first Entry in the queue which should be the first added song, that was already played.
+But for some reason it is not playing this song.
+"""
 def _play_next_song(guild):
    if should_continue[guild]:
       if len(queues[guild]) > 0:
