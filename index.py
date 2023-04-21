@@ -62,6 +62,9 @@ new_queue = {}
 # Define a flag to indicate whether the bot should continue playing the next song
 should_continue = {}
 
+# Define a pause flag
+pause_val = {}
+
 # Variable for Volume
 volume_val = {}
 
@@ -160,6 +163,7 @@ async def _init_command_join_response(interaction):
 
       # Set default volume level
       volume_val[interaction.guild.id] = 0.01
+      pause_val[interaction.guild.id] = False
 
       # Write in Chat that Bot joined channel
       await interaction.followup.send(f"Joined Channel **{interaction.user.voice.channel.name}**")
@@ -202,29 +206,28 @@ async def _init_command_play_response(interaction, url):
       player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = volume_val[interaction.guild.id])
 
       # Check if Bot is connected to a channel
-      if voice_clients[interaction.guild.id] != None:
+      if voice_clients[interaction.guild.id] == None:
+         _init_command_join_response(interaction)
 
-          # Check if queue for voice channel does already exist. If not create one
-         if queues[interaction.guild.id] == None:
-            queues[interaction.guild.id] = []
+      # Check if queue for voice channel does already exist. If not create one
+      if queues[interaction.guild.id] == None:
+         queues[interaction.guild.id] = []
 
-         # Tell Discord that it should continue playback
-         should_continue[interaction.guild.id] = True
+      # Tell Discord that it should continue playback
+      should_continue[interaction.guild.id] = True
 
-         # Add player to queue
-         queues[interaction.guild.id].append({'player': player, 'title': data['title'], 'duration': data['duration_string']})
+      # Add player to queue
+      queues[interaction.guild.id].append({'player': player, 'title': data['title'], 'duration': data['duration_string']})
 
-         # Check if Bot is not already playing
-         if not voice_clients[interaction.guild.id].is_playing() and queues[interaction.guild.id]:
-            voice_clients[interaction.guild.id].play(queues[interaction.guild.id][0]['player'], after=lambda _: _play_next_song(interaction.guild.id))
-            new_queue[interaction.guild.id] = True
-         else:
-            if new_queue[interaction.guild.id] == True:
-               return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])-1} Songs queued")
-            else:
-               return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])} Songs queued")
+      # Check if Bot is not already playing
+      if not voice_clients[interaction.guild.id].is_playing() and queues[interaction.guild.id] and pause_val[interaction.guild.id] != True:
+         voice_clients[interaction.guild.id].play(queues[interaction.guild.id][0]['player'], after=lambda _: _play_next_song(interaction.guild.id))
+         new_queue[interaction.guild.id] = True
       else:
-         return await interaction.followup.send("Not connected to a channel. Use **/join** first")
+         if new_queue[interaction.guild.id] == True:
+            return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])-1} Songs queued")
+         else:
+            return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])} Songs queued")
 
       await interaction.followup.send(f"Start playing: **{data['title']}** (`{data['duration_string']}`)")
 
@@ -255,29 +258,28 @@ async def _init_command_search_response(interaction, search):
       player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = volume_val[interaction.guild.id])
 
       # Check if Bot is connected to a channel
-      if voice_clients[interaction.guild.id] != None:
+      if voice_clients[interaction.guild.id] == None:
+         _init_command_join_response(interaction)
 
-          # Check if queue for voice channel does already exist. If not create one
-         if queues[interaction.guild.id] == None:
-            queues[interaction.guild.id] = []
+      # Check if queue for voice channel does already exist. If not create one
+      if queues[interaction.guild.id] == None:
+         queues[interaction.guild.id] = []
 
-         # Tell Discord that it should continue playback
-         should_continue[interaction.guild.id] = True
+      # Tell Discord that it should continue playback
+      should_continue[interaction.guild.id] = True
 
-         # Add player to queue
-         queues[interaction.guild.id].append({'player': player, 'title': data['title'], 'duration': data['duration_string']})
+      # Add player to queue
+      queues[interaction.guild.id].append({'player': player, 'title': data['title'], 'duration': data['duration_string']})
 
-         # Check if Bot is not playing something and song is in queue
-         if not voice_clients[interaction.guild.id].is_playing() and queues[interaction.guild.id]:
-            voice_clients[interaction.guild.id].play(queues[interaction.guild.id][0]['player'], after=lambda _: _play_next_song(interaction.guild.id))
-            new_queue[interaction.guild.id] = True
-         else:
-            if new_queue[interaction.guild.id] == True:
-               return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])-1} Songs queued")
-            else:
-               return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])} Songs queued")
+      # Check if Bot is not playing something and song is in queue
+      if not voice_clients[interaction.guild.id].is_playing() and queues[interaction.guild.id] and pause_val[interaction.guild.id] != True:
+         voice_clients[interaction.guild.id].play(queues[interaction.guild.id][0]['player'], after=lambda _: _play_next_song(interaction.guild.id))
+         new_queue[interaction.guild.id] = True
       else:
-         return await interaction.followup.send("Not connected to a channel. Use **/join** first")
+         if new_queue[interaction.guild.id] == True:
+            return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])-1} Songs queued")
+         else:
+            return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])} Songs queued")
 
       await interaction.followup.send(f"Start playing: **{data['title']}** (`{data['duration_string']}`)")
 
@@ -387,6 +389,7 @@ async def _init_command_pause_response(interaction):
       await interaction.response.defer()
 
       voice_clients[interaction.guild.id].pause()
+      pause_val[interaction.guild.id] = True
 
       await interaction.followup.send("Pausing Playback")
    except Exception:
@@ -405,6 +408,7 @@ async def _init_command_resume_response(interaction):
       await interaction.response.defer()
 
       voice_clients[interaction.guild.id].resume()
+      pause_val[interaction.guild.id] = False
 
       await interaction.followup.send("Resuming Playback")
    except Exception:
