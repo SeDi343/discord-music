@@ -113,18 +113,18 @@ async def _init_command_help_response(interaction):
 
       await interaction.response.send_message("\n".join([
          f"Available Commands for {client.user.mention}:",
-         "**\\help** - Shows this Message.",
-         "**\\join** - Let\'s the user join into Users Channel.",
-         "**\\play url** - Start playback of Youtube URL or add it to queue if playback already started.",
-         "**\\search string** - Search Youtube and play first Video from Search or add it to queue if playback already started.",
-         "**\\next** or **\\skip** - Skip current playback and continue with next song in the queue.",
-         "**\\queue** or **\\list** - Print out the currently listed queue of songs",
-         "**\\volume 0-100** - Change Volume of Playback. Default is 3.",
-         "**\\pause** - Pause the current Playback to continue Playback later.",
-         "**\\resume** - Resume paused Playback.",
-         "**\\stop** - Stops current Playback.",
-         "**\\disconnect** or **\\leave** - Remove Bot from Playback Channel.",
-         f"**\\donation** - A link to support the creator of {client.user.mention}",
+         "**/help** - Shows this Message.",
+         "**/join** - Let\'s the user join into Users Channel.",
+         "**/play url** - Start playback of Youtube URL or add it to queue if playback already started.",
+         "**/search string** - Search Youtube and play first Video from Search or add it to queue if playback already started.",
+         "**/next** or **/skip** - Skip current playback and continue with next song in the queue.",
+         "**/queue** or **/list** - Print out the currently listed queue of songs",
+         "**/volume 0-100** - Change Volume of Playback. Default is 3.",
+         "**/pause** - Pause the current Playback to continue Playback later.",
+         "**/resume** - Resume paused Playback.",
+         "**/stop** - Stops current Playback.",
+         "**/disconnect** or **/leave** - Remove Bot from Playback Channel.",
+         f"**/donation** - A link to support the creator of {client.user.mention}",
       ]))
    except Exception:
       print(f" > Exception occured processing help command: {traceback.print_exc()}")
@@ -211,7 +211,7 @@ async def _init_command_play_response(interaction, url):
       player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = volume_val[interaction.guild.id])
 
       # Check if Bot is connected to a channel
-      if voice_clients[interaction.guild.id] == None:
+      if not voice_clients[interaction.guild.id] != None:
          _init_command_join_response(interaction)
 
       # Check if queue for voice channel does already exist. If not create one
@@ -263,7 +263,7 @@ async def _init_command_search_response(interaction, search):
       player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = volume_val[interaction.guild.id])
 
       # Check if Bot is connected to a channel
-      if voice_clients[interaction.guild.id] == None:
+      if not voice_clients[interaction.guild.id] != None:
          _init_command_join_response(interaction)
 
       # Check if queue for voice channel does already exist. If not create one
