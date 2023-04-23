@@ -202,39 +202,39 @@ async def _init_command_play_response(interaction, url):
          await interaction.followup.send("Youtube URL is required for this command. Use **/search** if you want to search for a song.")
          return
 
-      # Similar to a Thread it will run independent from the program. Sent command will only
-      # effect current user session
-      loop = asyncio.get_event_loop()
-      data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=(not stream)))
-
-      song = data['url'] if stream else ytdl.prepare_filename(data)
-      player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = volume_val[interaction.guild.id])
-
       # Check if Bot is connected to a channel
-      if not voice_clients[interaction.guild.id] != None:
-         _init_command_join_response(interaction)
+      if interaction.guild.id in voice_clients:
+         # Similar to a Thread it will run independent from the program. Sent command will only
+         # effect current user session
+         loop = asyncio.get_event_loop()
+         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=(not stream)))
 
-      # Check if queue for voice channel does already exist. If not create one
-      if queues[interaction.guild.id] == None:
-         queues[interaction.guild.id] = []
+         song = data['url'] if stream else ytdl.prepare_filename(data)
+         player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = volume_val[interaction.guild.id])
 
-      # Tell Discord that it should continue playback
-      should_continue[interaction.guild.id] = True
+         # Check if queue for voice channel does already exist. If not create one
+         if queues[interaction.guild.id] == None:
+            queues[interaction.guild.id] = []
 
-      # Add player to queue
-      queues[interaction.guild.id].append({'player': player, 'title': data['title'], 'duration': data['duration_string']})
+         # Tell Discord that it should continue playback
+         should_continue[interaction.guild.id] = True
 
-      # Check if Bot is not already playing
-      if not voice_clients[interaction.guild.id].is_playing() and queues[interaction.guild.id] and pause_val[interaction.guild.id] != True:
-         voice_clients[interaction.guild.id].play(queues[interaction.guild.id][0]['player'], after=lambda _: _play_next_song(interaction.guild.id))
-         new_queue[interaction.guild.id] = True
-      else:
-         if new_queue[interaction.guild.id] == True:
-            return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])-1} Songs queued")
+         # Add player to queue
+         queues[interaction.guild.id].append({'player': player, 'title': data['title'], 'duration': data['duration_string']})
+
+         # Check if Bot is not already playing
+         if not voice_clients[interaction.guild.id].is_playing() and queues[interaction.guild.id] and pause_val[interaction.guild.id] != True:
+            voice_clients[interaction.guild.id].play(queues[interaction.guild.id][0]['player'], after=lambda _: _play_next_song(interaction.guild.id))
+            new_queue[interaction.guild.id] = True
          else:
-            return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])} Songs queued")
+            if new_queue[interaction.guild.id] == True:
+               return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])-1} Songs queued")
+            else:
+               return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])} Songs queued")
 
-      await interaction.followup.send(f"Start playing: **{data['title']}** (`{data['duration_string']}`)")
+         await interaction.followup.send(f"Start playing: **{data['title']}** (`{data['duration_string']}`)")
+      else:
+         await interaction.followup.send("Not connected to a channel. Use **/join** first!")
 
    except KeyError or errors.ClientException:
       print(f" > Exception occured processing play command: {traceback.print_exc()}")
@@ -254,39 +254,39 @@ async def _init_command_search_response(interaction, search):
       # Tell Discord that request takes some time
       await interaction.response.defer()
 
-      # Similar to a Thread it will run independent from the program. Sent command will only
-      # effect current user session
-      loop = asyncio.get_event_loop()
-      data = await loop.run_in_executor(None, lambda: ytdl.extract_info(f"ytsearch:{search}", download=(not stream))['entries'][0])
-
-      song = data['url'] if stream else ytdl.prepare_filename(data)
-      player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = volume_val[interaction.guild.id])
-
       # Check if Bot is connected to a channel
-      if not voice_clients[interaction.guild.id] != None:
-         _init_command_join_response(interaction)
+      if interaction.guild.id in voice_clients:
+         # Similar to a Thread it will run independent from the program. Sent command will only
+         # effect current user session
+         loop = asyncio.get_event_loop()
+         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(f"ytsearch:{search}", download=(not stream))['entries'][0])
 
-      # Check if queue for voice channel does already exist. If not create one
-      if queues[interaction.guild.id] == None:
-         queues[interaction.guild.id] = []
+         song = data['url'] if stream else ytdl.prepare_filename(data)
+         player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = volume_val[interaction.guild.id])
 
-      # Tell Discord that it should continue playback
-      should_continue[interaction.guild.id] = True
+         # Check if queue for voice channel does already exist. If not create one
+         if queues[interaction.guild.id] == None:
+            queues[interaction.guild.id] = []
 
-      # Add player to queue
-      queues[interaction.guild.id].append({'player': player, 'title': data['title'], 'duration': data['duration_string']})
+         # Tell Discord that it should continue playback
+         should_continue[interaction.guild.id] = True
 
-      # Check if Bot is not playing something and song is in queue
-      if not voice_clients[interaction.guild.id].is_playing() and queues[interaction.guild.id] and pause_val[interaction.guild.id] != True:
-         voice_clients[interaction.guild.id].play(queues[interaction.guild.id][0]['player'], after=lambda _: _play_next_song(interaction.guild.id))
-         new_queue[interaction.guild.id] = True
-      else:
-         if new_queue[interaction.guild.id] == True:
-            return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])-1} Songs queued")
+         # Add player to queue
+         queues[interaction.guild.id].append({'player': player, 'title': data['title'], 'duration': data['duration_string']})
+
+         # Check if Bot is not playing something and song is in queue
+         if not voice_clients[interaction.guild.id].is_playing() and queues[interaction.guild.id] and pause_val[interaction.guild.id] != True:
+            voice_clients[interaction.guild.id].play(queues[interaction.guild.id][0]['player'], after=lambda _: _play_next_song(interaction.guild.id))
+            new_queue[interaction.guild.id] = True
          else:
-            return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])} Songs queued")
+            if new_queue[interaction.guild.id] == True:
+               return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])-1} Songs queued")
+            else:
+               return await interaction.followup.send(f"Queued Song: **{data['title']}** (`{data['duration_string']}`)\n{len(queues[interaction.guild.id])} Songs queued")
 
-      await interaction.followup.send(f"Start playing: **{data['title']}** (`{data['duration_string']}`)")
+         await interaction.followup.send(f"Start playing: **{data['title']}** (`{data['duration_string']}`)")
+      else:
+         await interaction.followup.send("Not connected to a channel. Use **/join** first!")
 
    except KeyError or errors.ClientException:
       print(f" > Exception occured processing play command: {traceback.print_exc()}")
