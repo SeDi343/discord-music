@@ -98,7 +98,7 @@ async def on_ready():
     ]))
 
     #await client.change_presence(status=Status.online, activity=Game(name="You don't regret the things you did wrong as much as the ones you didn't even try."))
-    await client.change_presence(status=Status.online, activity=Game(name="Update: Can now queue up songs for you :)"))
+    await client.change_presence(status=Status.online, activity=Game(name="/help | aerography.eu"))
 
 #########################################################################################
 # Functions
