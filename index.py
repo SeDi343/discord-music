@@ -8,7 +8,7 @@ import requests
 import traceback
 #from youtube_dl import YoutubeDL
 from yt_dlp import YoutubeDL
-from discord import app_commands, Intents, Client, Interaction, Status, Game, FFmpegPCMAudio, errors, PCMVolumeTransformer
+from discord import app_commands, Intents, Client, Interaction, Status, Game, FFmpegPCMAudio, errors, PCMVolumeTransformer, Embed
 
 #########################################################################################
 # Requirements for Discord Bot
@@ -127,8 +127,15 @@ async def _init_command_help_response(interaction):
          f"**/donation** - A link to support the creator of {client.user.mention}",
       ]))
    except Exception:
-      print(f" > Exception occured processing help command: {traceback.print_exc()}")
+      print(f" > Exception occured processing help command: {traceback.format_exc()}")
       return await interaction.response.send_message(f"Can not process help command. Please contact <@164129430766092289> when this happened.")
+
+
+# Function for exception response
+def console_create(traceback):
+   embed = Embed(title="Traceback")
+   embed.set_footer(text=re.sub(r'File ".*[\\/]([^\\/]+.py)"',r'File "\1"', traceback.format_exc()))
+   return embed
 
 
 # Private Function to play next song in queue
@@ -173,7 +180,7 @@ async def _init_command_join_response(interaction):
       # Write in Chat that Bot joined channel
       await interaction.followup.send(f"Joined Channel **{interaction.user.voice.channel.name}**")
    except Exception:
-      print(f" > Exception occured processing join command: {traceback.print_exc()}")
+      print(f" > Exception occured processing join command: {traceback.format_exc()}")
       return await interaction.followup.send("Unable to Join Channel. Make sure you are in a Voice Channel.")
 
 
@@ -237,10 +244,10 @@ async def _init_command_play_response(interaction, url):
          await interaction.followup.send("Not connected to a channel. Use **/join** first!")
 
    except KeyError or errors.ClientException:
-      print(f" > Exception occured processing play command: {traceback.print_exc()}")
+      print(f" > Exception occured processing play command: {traceback.format_exc()}")
       return await interaction.followup.send("Not connected to a channel. Use **/join** first!")
    except Exception:
-      print(f" > Exception occured processing play command: {traceback.print_exc()}")
+      print(f" > Exception occured processing play command: {traceback.format_exc()}")
       return await interaction.followup.send("Can not start Playback.")
 
 
@@ -289,10 +296,10 @@ async def _init_command_search_response(interaction, search):
          await interaction.followup.send("Not connected to a channel. Use **/join** first!")
 
    except KeyError or errors.ClientException:
-      print(f" > Exception occured processing play command: {traceback.print_exc()}")
+      print(f" > Exception occured processing play command: {traceback.format_exc()}")
       return await interaction.followup.send("Not connected to a channel. Use **/join** first!")
    except Exception:
-      print(f" > Exception occured processing search command: {traceback.print_exc()}")
+      print(f" > Exception occured processing search command: {traceback.format_exc()}")
       return await interaction.followup.send("Can not start Playback.")
 
 
@@ -322,7 +329,7 @@ async def _init_command_next_response(interaction):
          return await interaction.followup.send("Not connected to a channel. Use **/join** first")
 
    except Exception:
-      print(f" > Exception occured processing next command: {traceback.print_exc()}")
+      print(f" > Exception occured processing next command: {traceback.format_exc()}")
       return await interaction.followup.send("Can not skip track.")
 
 
@@ -355,7 +362,7 @@ async def _init_command_queue_response(interaction):
             return await interaction.followup.send("No Songs in Queue")
 
    except Exception:
-      print(f" > Exception occured processing queue command: {traceback.print_exc()}")
+      print(f" > Exception occured processing queue command: {traceback.format_exc()}")
       return await interaction.followup.send("Can not print out queued songs.")
 
 # Function to change volume
@@ -379,7 +386,7 @@ async def _init_command_volume_response(interaction, volume):
 
       await interaction.followup.send(f"Changed Volume to **{volume}**%")
    except Exception:
-      print(f" > Exception occured processing volume command: {traceback.print_exc()}")
+      print(f" > Exception occured processing volume command: {traceback.format_exc()}")
       return await interaction.followup.send("Can not change Volume.")
 
 
@@ -398,7 +405,7 @@ async def _init_command_pause_response(interaction):
 
       await interaction.followup.send("Pausing Playback")
    except Exception:
-      print(f" > Exception occured processing pause command: {traceback.print_exc()}")
+      print(f" > Exception occured processing pause command: {traceback.format_exc()}")
       return await interaction.followup.send("Can not pause Playback.")
 
 
@@ -417,7 +424,7 @@ async def _init_command_resume_response(interaction):
 
       await interaction.followup.send("Resuming Playback")
    except Exception:
-      print(f" > Exception occured processing resume command: {traceback.print_exc()}")
+      print(f" > Exception occured processing resume command: {traceback.format_exc()}")
       return await interaction.followup.send("Can not resume Playback.")
 
 
@@ -441,7 +448,7 @@ async def _init_command_stop_response(interaction):
 
       await interaction.followup.send("Stop Playback")
    except Exception:
-      print(f" > Exception occured processing stop command: {traceback.print_exc()}")
+      print(f" > Exception occured processing stop command: {traceback.format_exc()}")
       return await interaction.followup.send("Can not stop Playback.")
 
 
@@ -468,7 +475,7 @@ async def _init_command_disconnect_response(interaction):
 
       await interaction.followup.send("Disconnected")
    except Exception:
-      print(f" > Exception occured processing disconnect command: {traceback.print_exc()}")
+      print(f" > Exception occured processing disconnect command: {traceback.format_exc()}")
       return await interaction.followup.send(f"Can not disconnect from channel {interaction.user.voice.channel.name}.")
 
 
@@ -485,7 +492,7 @@ async def _init_command_donation_response(interaction):
          f"Hey {interaction.user.mention}, thank you for considering donating to support my work!",
          f"You can donate via PayPal using {donationlink} :heart_hands:"]))
    except Exception:
-      print(f" > Exception occured processing donation command: {traceback.print_exc()}")
+      print(f" > Exception occured processing donation command: {traceback.format_exc()}")
       return await interaction.response.send_message(f"Can not process donation command. Please contact <@164129430766092289> when this happened.")
 
 #########################################################################################
