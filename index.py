@@ -8,7 +8,7 @@ import requests
 import traceback
 #from youtube_dl import YoutubeDL
 from yt_dlp import YoutubeDL
-from discord import app_commands, Intents, Client, Interaction, Status, Game, FFmpegPCMAudio, errors, PCMVolumeTransformer, Embed
+from discord import app_commands, Intents, Client, Interaction, FFmpegPCMAudio, errors, PCMVolumeTransformer, Embed, Activity, ActivityType
 
 #########################################################################################
 # Requirements for Discord Bot
@@ -97,8 +97,7 @@ async def on_ready():
         f"https://discord.com/api/oauth2/authorize?client_id={client.user.id}&scope=applications.commands%20bot"
     ]))
 
-    #await client.change_presence(status=Status.online, activity=Game(name="You don't regret the things you did wrong as much as the ones you didn't even try."))
-    await client.change_presence(status=Status.online, activity=Game(name="/help | aerography.eu"))
+    await client.change_presence(activity=Activity(type=ActivityType.listening, name="/help | aerography.eu"))
 
 #########################################################################################
 # Functions
