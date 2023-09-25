@@ -97,7 +97,7 @@ async def on_ready():
         f"https://discord.com/api/oauth2/authorize?client_id={client.user.id}&scope=applications.commands%20bot"
     ]))
 
-    await client.change_presence(activity=Activity(type=ActivityType.listening, name="/help | aerography.eu"))
+    await client.change_presence(activity=Activity(type=ActivityType.playing, name="/help | aerography.eu"))
 
 #########################################################################################
 # Functions
