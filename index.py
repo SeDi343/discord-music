@@ -485,11 +485,9 @@ async def _init_command_donation_response(interaction):
       # Respond in the console that the command has been ran
       print(f"> {interaction.guild} : {interaction.user} used the donation command.")
 
-      donationlink = config_data.get("donation_link")
-
       await interaction.response.send_message("\n".join([
          f"Hey {interaction.user.mention}, thank you for considering donating to support my work!",
-         f"You can donate via PayPal using {donationlink} :heart_hands:"]))
+         f"You can donate via PayPal using https://donate.aerography.eu/ :heart_hands:"]))
    except Exception:
       print(f" > Exception occured processing donation command: {traceback.format_exc()}")
       return await interaction.response.send_message(f"Can not process donation command. Please contact <@164129430766092289> when this happened.")
