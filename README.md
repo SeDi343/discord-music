@@ -5,6 +5,7 @@ A Music Discord Bot that uses ytdl and ffmpeg to play some fancy music and simpl
 * python3.8
 * ffmpeg
 * screen
+
 First you need to download ffmpeg https://ffmpeg.org/download.html#build-linux  
 This Music Bot requires python3 and python venv(tested on 3.11 and 3.13) https://www.python.org/downloads/  
 
