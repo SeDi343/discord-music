@@ -1,1 +1,1 @@
-screen -dmS discordmusic python3 index.py
+screen -dmS discordmusic bash -c "source discord-music-venv/bin/activate && python3 index.py"

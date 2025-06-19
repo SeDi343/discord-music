@@ -41,6 +41,14 @@ yt_dl_opts = {
    'format': 'm4a/bestaudio/best',
    'noplaylist': 'True',
    'outtmpl': 'download/%(id)s',
+   'postprocessors': [{
+      'key': 'FFmpegExtractAudio',
+      'preferredcodec': 'mp3',
+      'preferredquality': '192'
+   }],
+   'prefer_ffmpeg': True,
+   'keepvideo': True,
+   'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'
 }
 ytdl = YoutubeDL(yt_dl_opts)
 stream = False
@@ -215,7 +223,7 @@ async def _init_command_play_response(interaction, url):
          loop = asyncio.get_event_loop()
          data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=(not stream)))
 
-         song = data['url'] if stream else ytdl.prepare_filename(data)
+         song = data['url'] if stream else ytdl.prepare_filename(data) + '.mp3'
          player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = volume_val[interaction.guild.id])
 
          # Check if queue for voice channel does already exist. If not create one
@@ -267,7 +275,7 @@ async def _init_command_search_response(interaction, search):
          loop = asyncio.get_event_loop()
          data = await loop.run_in_executor(None, lambda: ytdl.extract_info(f"ytsearch:{search}", download=(not stream))['entries'][0])
 
-         song = data['url'] if stream else ytdl.prepare_filename(data)
+         song = data['url'] if stream else ytdl.prepare_filename(data) + '.mp3'
          player = PCMVolumeTransformer(FFmpegPCMAudio(song, **ffmpeg_options), volume = volume_val[interaction.guild.id])
 
          # Check if queue for voice channel does already exist. If not create one
