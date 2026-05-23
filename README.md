@@ -2,9 +2,16 @@
 A Music Discord Bot that uses ytdl and ffmpeg to play some fancy music and simply works. This Bot uses Slash Commands.  
 
 ### Dependencies
-* python3.8
+* python3.8, 3.11, 3.13
 * ffmpeg
 * screen
+* deno
+
+#### Install deno on fedora
+```
+sudo dnf copr enable pgdev/deno
+sudo dnf install deno
+```
 
 First you need to download ffmpeg https://ffmpeg.org/download.html#build-linux  
 This Music Bot requires python3 and python venv(tested on 3.11 and 3.13) https://www.python.org/downloads/  

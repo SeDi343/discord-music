@@ -49,7 +49,15 @@ yt_dl_opts = {
    }],
    'prefer_ffmpeg': True,
    'keepvideo': True,
-   'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'
+   'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
+
+   # JS runtime for YouTube extraction
+   'js_runtimes': {
+      'deno': {
+         'path': '/usr/bin/deno'
+      }
+   },
+   'remote_components': ['ejs:github'],
 }
 ytdl = YoutubeDL(yt_dl_opts)
 stream = False
