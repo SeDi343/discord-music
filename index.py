@@ -54,7 +54,7 @@ yt_dl_opts = {
    # JS runtime for YouTube extraction
    'js_runtimes': {
       'deno': {
-         'path': '/usr/bin/deno'
+         'path': config_data.get("js-runtime-path")
       }
    },
    'remote_components': ['ejs:github'],
